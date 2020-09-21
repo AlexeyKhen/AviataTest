@@ -6,6 +6,10 @@ from django.core.cache import cache
 from django.utils.text import slugify
 
 
+def clear_cache():
+    cache.clear()
+
+
 def request_put_post(type_of, obj, key):
     data = {'date': obj.get('date'),
             'flyFrom': obj.get('flyFrom'),
@@ -21,34 +25,33 @@ def request_put_post(type_of, obj, key):
         requests.post('http://localhost:8000/api/', data=data)
 
 
-def getting_rough_data():
-    if 'first_cache' in cache:
-        first_cache = cache.get('first_cache')
+def getting_rough_data(fromTo, flyTo, dateFrom, dateTo):
+    cache_name = f'first_cache-{fromTo}-{flyTo}-{dateFrom}-{dateTo}'
+    if cache_name in cache:
+        first_cache = cache.get(cache_name)
     else:
-
-        payload = {"flyFrom": "TSE", "to": "ALA", "dateFrom": "8/11/2020", "dateTo": "18/12/2020", 'partner': "picky"}
+        payload = {"flyFrom": fromTo, "to": flyTo, "dateFrom": dateFrom, "dateTo": dateTo, 'partner': "picky"}
         r = requests.get(
             "https://api.skypicker.com/flights", params=payload)
         first_cache = r.json().get('data')
+        cache.set(cache_name, first_cache, timeout=24 * 60 * 60)
 
-        cache.set('first_cache', first_cache, timeout=24 * 60 * 60)
     return first_cache
 
 
-def filtering_data(first_cache):
+def filtering_data(first_cache, departure, arrival):
     data = {}
     for obj in first_cache:
         timestamp = str((date.fromtimestamp(obj.get('dTime'))))
-        flyFrom = obj.get('flyFrom')
-        flyTo = obj.get('flyTo')
-        key = slugify(f'{timestamp}-{flyFrom}-{flyTo}')
+        key = slugify(f'{timestamp}-{departure}-{arrival}')
         flight_data = {"id_flight": obj.get('id'), 'price': obj.get('price'), 'token': obj.get('booking_token'),
 
-                       "flyFrom": flyFrom, "flyTo": flyTo, "date": timestamp}
+                       "flyFrom": departure, "flyTo": arrival, "date": timestamp}
         if key not in data.keys():
             data[key] = [flight_data]
         else:
             data[key].append(flight_data)
+        cache.set(f'{timestamp}-{departure}-{arrival}', flight_data, timeout=24 * 60 * 60)
 
     return data
 

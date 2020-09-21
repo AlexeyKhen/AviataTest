@@ -19,7 +19,18 @@ from caching.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', AlaTse.as_view(), name='AlaTse'),
+    path('clearcache/', clear_cache_full, name='clear_cache'),
+    path('TseAla/', TseAla.as_view(), name='TseAla'),
+    path('AlaMow/', AlaMow.as_view(), name='AlaMow'),
+    path('MowAla/', MowAla.as_view(), name='MowAla'),
+    path('AlaCit/', AlaCit.as_view(), name='AlaCit'),
+    path('CitAla/', CitAla.as_view(), name='CitAla'),
+    path('TseMow/', TseMow.as_view(), name='TseMow'),
+    path('MowTse/', MowTse.as_view(), name='MowTse'),
+    path('TseLed/', TseLed.as_view(), name='TseLed'),
+    path('LedTse/', LedTse.as_view(), name='LedTse'),
     path('api/', FlightListCreateView.as_view(), name='FlightListCreateView'),
     path('api/<slug>', FlightsDetailView.as_view(), name='FlightsDetailView'),
+
 ]

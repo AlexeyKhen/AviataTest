@@ -1,0 +1,22 @@
+<div class="list-group">
+    {% for object in object_list %}
+        <a href="#" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ object.date }}</h5>
+                <small class="text-muted">flight id: {{ object.id_flight }}</small>
+            </div>
+            <p class="mb-1"> The minimum price we could find is {{ object.price }} EUR</p>
+            <small class="text-muted">Note that booking data could be changed</small>
+        </a>
+
+    {% empty %}
+
+        <div class="text-center">
+            <h1> Please wait cache is being created </h1>
+            <div class="spinner-border" style="width: 10rem; height: 10rem;margin-top: 100px" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    {% endfor %}
+
+</div>

@@ -123,7 +123,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -133,3 +132,9 @@ CACHES = {
         }
     }
 }
+
+## CELERY
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
