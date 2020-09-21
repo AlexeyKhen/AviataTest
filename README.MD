@@ -35,3 +35,4 @@ Celery worker: celery -A aviata worker -l info
 
 Celery beat: celery -A aviata beat -l info
 
+я потестил, все должно работать.
