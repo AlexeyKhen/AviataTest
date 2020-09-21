@@ -27,10 +27,11 @@ Redis, поэтому сначала убедитесь, что он у вас �
 
 4.Запустите в трех раздельных терминалах
 
+Django-server: python manage.py runserver
+
 Redis : redis-server
 
 Celery worker: celery -A aviata worker -l info
 
 Celery beat: celery -A aviata beat -l info
 
-Django-server: python manage.py runserver
