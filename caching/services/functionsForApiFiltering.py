@@ -51,58 +51,63 @@ def filtering_data(first_cache, departure, arrival):
             data[key] = [flight_data]
         else:
             data[key].append(flight_data)
-        cache.set(f'{timestamp}-{departure}-{arrival}', flight_data, timeout=24 * 60 * 60)
 
     return data
 
 
 def posting_flights(data):
     for key in data.keys():
+
         if key in cache:
+
             obj = cache.get(key)
             request_put_post('PUT', obj, key)
-
         else:
+
             obj = data[key][0]
             cache.set(key, obj, timeout=24 * 60 * 60)
             request_put_post('POST', obj, key)
 
 
-def updating_data(old_data, new_data):
-    i = 0
-    for key in new_data.keys():
-        i += 1
-        if not (old_data[key] == new_data[key]):
-            obj = new_data[key]
-            request_put_post('PUT', obj, key)
-    print(i)
+def posting_new_flights_daily_basis(data):
+    for key in data.keys():
+
+        if key not in cache:
+            obj = data[key][0]
+            cache.set(key, obj, timeout=24 * 60 * 60)
+            request_put_post('POST', obj, key)
 
 
 def finding_min_price_and_validation(data):
-    if 'filtered' in cache:
-        new_array = cache.get('filtered')
-    else:
-        new_array = {}
-        for key in data.keys():
-            list_cycle = itertools.cycle(data[key])
-            for obj in data[key]:
-                token = obj.get("token")
+    i = 0
+    for key in data.keys():
+        list_cycle = itertools.cycle(data[key])
 
-                payload = {"v": 2, "booking_token": token, 'bnum': 1, 'pnum': 1}
-                r = requests.get("https://booking-api.skypicker.com/api/v0.1/check_flights", params=payload)
-                flight_data = r.json()
+        for obj in data[key]:
+            token = obj.get("token")
+            payload = {"v": 2, "booking_token": token, 'bnum': 1, 'pnum': 1}
+            r = requests.get("https://booking-api.skypicker.com/api/v0.1/check_flights", params=payload)
+            flight_data = r.json()
 
-                condition = not flight_data.get("flights_invalid") and flight_data.get("flights_checked")
+            condition = not flight_data.get("flights_invalid") and flight_data.get("flights_checked")
 
-                if flight_data.get('price_change'):
-                    obj['price'] = flight_data.get('total')
-                    if obj['price'] > next(list_cycle)['price']:
-                        continue
+            if flight_data.get('price_change'):
+                obj['price'] = flight_data.get('total')
+                if obj['price'] > next(list_cycle)['price']:
+                    print('cont')
+                    continue
 
-                if condition:
-                    new_array[key] = obj
+            if condition:
+
+                if cache.get(key)['id_flight'] == obj['id_flight']:
+
                     break
+                else:
+                    request_put_post('PUT', obj, key)
+                    cache.set(key, obj, timeout=24 * 60 * 60)
 
-        cache.set('filtered', new_array, timeout=24 * 60 * 60)
+                    i += 1
+                break
 
-    return new_array
+    print(f'number of changed flights: {i}')
+    return None

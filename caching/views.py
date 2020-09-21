@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
-from .services.cacheCreator import *
+from .services.cacheCreatorInitial import *
 from .tasks import *
 from .services.retrievingQueryset import *
 from .tasks import creating_and_testing_initial_cache
@@ -27,11 +27,10 @@ class FlightsDetailView(RetrieveUpdateAPIView):
     lookup_field = "slug"
 
 
-def clear_cache_full(request):
-    clear_cache()
-    # creating_andtesting_initial_cache.delay()
-    # setting_database()
-    return HttpResponse('cache cleared')
+def initialize_caching(request):
+    creating_and_testing_initial_cache.delay()
+
+    return render(request, 'caching.html')
 
 
 class AlaTse(ListView):

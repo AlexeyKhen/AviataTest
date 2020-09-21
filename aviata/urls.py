@@ -20,7 +20,7 @@ from caching.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', AlaTse.as_view(), name='AlaTse'),
-    path('clearcache/', clear_cache_full, name='clear_cache'),
+    path('cache/', initialize_caching, name='initialize_caching'),
     path('TseAla/', TseAla.as_view(), name='TseAla'),
     path('AlaMow/', AlaMow.as_view(), name='AlaMow'),
     path('MowAla/', MowAla.as_view(), name='MowAla'),
